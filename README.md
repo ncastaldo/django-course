@@ -48,6 +48,14 @@ Use `from django.forms.models import model_to_dict` and the method to automatica
 
 Currently, we are using the `JsonResponse` object, but we can use the `HttpResponse` to have a `text/html` content type (by default), or a different format with `HttpResponse(data, headers={'contentType': 'application/json'})`. However, in this case, we cannot pass the data as is (i.e. a dictionary) and without using `json.dumps(...)` because there may be complex types coming from Django, such as `Decimal`. 
 
+### From the API view to the Django REST framework view
+
+Use:
+- `from rest_framework.response import Response`, which is a wrapper for the data
+- `from rest_framework.decorators import api_view`, which is a decorator
+
+Now we can transform the `api_home` method into a REST enpoint buy using `@api_view(["GET"])` as annotation and `Response(data)` as return value.   
+
 ## The frontend
 
 Inside the `py_client` folder we are going to create the client consuming the API.
@@ -91,3 +99,104 @@ kwargs {'first': 'Nicola', 'second': 'here'}
 ### dir()
 
 The dir() method returns the list of valid attributes of the passed object.
+
+### Decorators
+
+Decorators provide a simple syntax for calling higher-order functions. By definition, a decorator is a function that takes another function and extends the behavior of the latter function without explicitly modifying it.
+
+Put simply: decorators wrap a function, modifying its behavior.
+
+Instead, Python allows you to use decorators in a simpler way with the `@` symbol, sometimes called the “pie” syntax.
+
+Example:
+
+```python
+def do_twice(func):
+    @functools.wraps(func)
+    def wrapper_do_twice(*args, **kwargs):
+        func(*args, **kwargs)
+        return func(*args, **kwargs)
+    return wrapper_do_twice
+
+@my_decorator
+def say_whee():
+    print("Whee!")
+```
+
+We use `*args, **kwargs` to permit any number of arguments and keyword-arguments.
+Moreover, make sure the wrapper function returns the return value of the decorated function.
+
+After being decorated, `say_whee()` has gotten very confused about its identity. It now reports being the wrapper_do_twice() inner function inside the do_twice() decorator. Although technically true, this is not very useful information.
+
+To fix this, decorators should use the `@functools.wraps` decorator, which will preserve information about the original function. 
+
+### Classes as Decorators
+
+The typical way to maintain state is by using classes. 
+
+Recall that the decorator syntax `@my_decorator` is just an easier way of saying `func = my_decorator(func)`. Therefore, if `my_decorator` is a class, it needs to take `func` as an argument in its `.__init__()` method. Furthermore, the class instance needs to be callable so that it can stand in for the decorated function.
+
+For a class instance to be callable, you implement the special .__call__() method.
+
+```python
+class Counter:
+    def __init__(self, start=0):
+        self.count = start
+
+    def __call__(self):
+        self.count += 1
+        print(f"Current count is {self.count}")
+```
+
+The .__call__() method is executed each time you try to call an instance of the class:
+
+```python
+counter = Counter()
+counter()
+# Current count is 1
+counter()
+# Current count is 2
+```
+
+Real world example:
+
+```python
+import functools
+
+class CountCalls:
+    def __init__(self, func):
+        functools.update_wrapper(self, func)
+        self.func = func
+        self.num_calls = 0
+
+    def __call__(self, *args, **kwargs):
+        self.num_calls += 1
+        print(f"Call {self.num_calls} of {self.func.__name__!r}")
+        return self.func(*args, **kwargs)
+
+@CountCalls
+def say_whee():
+    print("Whee!")
+```
+
+The `.__init__()` method must store a reference to the function and can do any other necessary initialization. The `.__call__()` method will be called instead of the decorated function. It does essentially the same thing as the `wrapper()` function in our earlier examples. Note that you need to use the `functools.update_wrapper()` function instead of `@functools.wraps`.
+
+### Closures
+
+Remember the `nonlocal` keyword. `start` is the so called free variable.
+
+```python
+def counter(start):
+    def inc(step=1):
+        nonlocal start # otherwise not defined
+        start += step
+        print(start)
+
+    return inc
+
+increment = counter(3)
+increment(3) # 6
+increment(2) # 8
+```
+
+In Python we can inspect the closure with `increment.__code__.co_freevars` and `increment.__closure__`.
