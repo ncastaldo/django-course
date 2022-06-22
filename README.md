@@ -44,6 +44,10 @@ In order to enter the shell of Django, execute `python3 manage.py shell`; now cr
 
 In the `views.py` of the `api`, use `Product.objects.all().order_by('?').first()` to retrieve all the products and pick a random one. 
 
+Use `from django.forms.models import model_to_dict` and the method to automatically transform the model into a dictionary.
+
+Currently, we are using the `JsonResponse` object, but we can use the `HttpResponse` to have a `text/html` content type (by default), or a different format with `HttpResponse(data, headers={'contentType': 'application/json'})`. However, in this case, we cannot pass the data as is (i.e. a dictionary) and without using `json.dumps(...)` because there may be complex types coming from Django, such as `Decimal`. 
+
 ## The frontend
 
 Inside the `py_client` folder we are going to create the client consuming the API.
