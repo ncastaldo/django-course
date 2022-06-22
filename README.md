@@ -56,6 +56,10 @@ Use:
 
 Now we can transform the `api_home` method into a REST enpoint buy using `@api_view(["GET"])` as annotation and `Response(data)` as return value.   
 
+### Django Rest Framework Model Serializer
+
+
+
 ## The frontend
 
 Inside the `py_client` folder we are going to create the client consuming the API.
@@ -200,3 +204,67 @@ increment(2) # 8
 ```
 
 In Python we can inspect the closure with `increment.__code__.co_freevars` and `increment.__closure__`.
+
+### The underscores _
+
+####  Single Leading Underscore: _bar
+The underscore prefix (i.e. `_bar`) is meant as a hint to another programmer that a variable or method starting with a single underscore is intended for internal use.
+
+```python
+class Test:
+    def __init__(self):
+        self.foo = 11
+        self._bar = 23
+```
+
+#### Single Trailing Underscore: class_
+
+Sometimes the most fitting name for a variable is already taken by a keyword. Therefore names like class or def cannot be used as variable names in Python. 
+
+```python
+def make_object(name, class):
+    pass
+# SyntaxError: "invalid syntax"
+
+def make_object(name, class_):
+     pass
+# OK!
+```
+
+#### Double Leading Underscore: __bar -> Name Mangling
+
+A double underscore prefix causes the Python interpreter to **rewrite the attribute name** in order to avoid naming conflicts in subclasses.
+
+This is also called **name mangling** -the interpreter changes the name of the variable in a way that makes it harder to create collisions when the class is extended later.
+
+```python
+class Test:
+    def __init__(self):
+        self.foo = 11
+        self._bar = 23
+        self.__baz = 23
+
+t = Test()
+dir(t) # ['_Test__baz', '__class__', ...,  '_bar', 'foo']
+```
+
+### \_\_init\_\_ vs \_\_call\_\_
+
+In Python, functions are first-class objects and instances of Classes (aka Objects), can be treated as if they were functions: pass them to other methods/functions and call them.
+
+- ` __init__` is used to initialize newly created object
+- ` __call__` implements function call operator
+
+```python
+class Foo:
+    def __init__(self, a, b, c):
+        # ...
+
+    def __call__(self, d, e, f):
+        # ...
+        
+x = Foo(1, 2, 3) # __init__
+x(4, 5, 6) # __call__
+```
+
+
