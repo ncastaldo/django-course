@@ -77,7 +77,7 @@ JSON format is slightly different from Python3 dict object
 
 ## Common
 
-### *args and **kwargs
+### \*args and \*\*kwargs
 
 ```python
 def myFun(*args,**kwargs):
@@ -207,7 +207,7 @@ In Python we can inspect the closure with `increment.__code__.co_freevars` and `
 
 ### The underscores _
 
-####  Single Leading Underscore: _bar
+####  Single Leading Underscore: \_bar
 The underscore prefix (i.e. `_bar`) is meant as a hint to another programmer that a variable or method starting with a single underscore is intended for internal use.
 
 ```python
@@ -231,7 +231,7 @@ def make_object(name, class_):
 # OK!
 ```
 
-#### Double Leading Underscore: __bar -> Name Mangling
+#### Double Leading Underscore: \_\_bar -> Name Mangling
 
 A double underscore prefix causes the Python interpreter to **rewrite the attribute name** in order to avoid naming conflicts in subclasses.
 
